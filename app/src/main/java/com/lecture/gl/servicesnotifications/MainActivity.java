@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,13 +55,22 @@ public class MainActivity extends AppCompatActivity {
                 nm.createNotificationChannel(notificationChannel);
             }
 
-            Intent notificationIntent = new Intent(getApplicationContext(), Activity.class);
-            PendingIntent pIntent =  PendingIntent.getActivity(MainActivity.this, 1234, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Intent resultIntent = new Intent(MainActivity.this, MainActivity.class);
+            // Create the TaskStackBuilder and add the intent, which inflates the back stack
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(MainActivity.this);
+            stackBuilder.addNextIntentWithParentStack(resultIntent);
+            // Get the PendingIntent containing the entire back stack
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this,"my_channel" )
                     .setContentTitle("ServiceNot's")
                     .setAutoCancel(true)
                     .setContentText(the_url + " downloaded")
-                    .setContentIntent(pIntent)
+                    .setContentIntent(resultPendingIntent)
                     .setSmallIcon(R.drawable.ic_file_download_black_24dp);
 
             Notification notification = notificationBuilder.build();
